@@ -1,0 +1,136 @@
+{
+  "name": "codeding",
+  "displayName": "CodeDing",
+  "description": "Play sounds when terminal commands finish",
+  "version": "1.0.0",
+  "publisher": "Developer",
+  "engines": {
+    "vscode": "^1.93.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "keywords": [
+    "sound",
+    "terminal",
+    "audio",
+    "success",
+    "error"
+  ],
+  "activationEvents": [
+    "onStartupFinished"
+  ],
+  "main": "./out/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "codeding.chooseSuccessSound",
+        "title": "CodeDing: Choose Success Sound"
+      },
+      {
+        "command": "codeding.chooseErrorSound",
+        "title": "CodeDing: Choose Error Sound"
+      },
+      {
+        "command": "codeding.testSuccessSound",
+        "title": "CodeDing: Test Success Sound"
+      },
+      {
+        "command": "codeding.testErrorSound",
+        "title": "CodeDing: Test Error Sound"
+      },
+      {
+        "command": "codeding.resetSuccessSound",
+        "title": "CodeDing: Reset Success Sound"
+      },
+      {
+        "command": "codeding.resetErrorSound",
+        "title": "CodeDing: Reset Error Sound"
+      },
+      {
+        "command": "codeding.openSettings",
+        "title": "CodeDing: Open Settings"
+      },
+      {
+        "command": "codeding.toggle",
+        "title": "CodeDing: Toggle Enable/Disable"
+      }
+    ],
+    "configuration": {
+      "title": "CodeDing",
+      "properties": {
+        "codeding.enabled": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable or disable all CodeDing sounds."
+        },
+        "codeding.successEnabled": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable or disable the success sound."
+        },
+        "codeding.errorEnabled": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable or disable the error sound."
+        },
+        "codeding.successSound": {
+          "type": "string",
+          "default": "",
+          "description": "Path to a custom WAV file for success. Leave empty to use the built-in default."
+        },
+        "codeding.errorSound": {
+          "type": "string",
+          "default": "",
+          "description": "Path to a custom WAV file for error. Leave empty to use the built-in default."
+        },
+        "codeding.triggerMode": {
+          "type": "string",
+          "enum": [
+            "codeRun",
+            "allTerminalCommands",
+            "custom"
+          ],
+          "default": "codeRun",
+          "description": "Determines which terminal commands trigger sounds."
+        },
+        "codeding.customCommands": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "default": [],
+          "description": "List of command string patterns to match when Trigger Mode is 'custom'."
+        },
+        "codeding.notificationLevel": {
+          "type": "string",
+          "enum": [
+            "quiet",
+            "diagnostics"
+          ],
+          "default": "quiet",
+          "description": "Level of notifications CodeDing should show."
+        }
+      }
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "pretest": "npm run compile && npm run lint",
+    "lint": "eslint src --ext ts",
+    "test": "node ./out/test/runTest.js"
+  },
+  "devDependencies": {
+    "@types/mocha": "^10.0.6",
+    "@types/node": "^18.19.0",
+    "@types/vscode": "^1.93.0",
+    "@typescript-eslint/eslint-plugin": "^7.1.0",
+    "@typescript-eslint/parser": "^7.1.0",
+    "@vscode/test-electron": "^2.3.9",
+    "eslint": "^8.56.0",
+    "mocha": "^10.3.0",
+    "typescript": "^5.3.3"
+  }
+}
