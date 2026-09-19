@@ -1,6 +1,16 @@
-# CodeDing
+<div align="center">
+  <img src="https://raw.githubusercontent.com/mykcodes/CodeDing---VS-Code-Extension/main/media/icon.jpg" width="128" alt="CodeDing Icon" />
+  <h1>CodeDing</h1>
+  <p><strong>Never stare at a compiling terminal again.</strong></p>
+</div>
 
-CodeDing is a lightweight VS Code extension that plays sounds when your terminal commands finish. Keep your flow and let CodeDing tell you when your long-running builds, tests, or scripts complete.
+CodeDing is a lightweight, zero-configuration VS Code extension that plays non-intrusive sounds when your terminal commands finish. Keep your flow state active, switch contexts to other windows, and let CodeDing notify you the exact moment your long-running builds, tests, or scripts complete.
+
+### Created by [Mayank Sharma](https://mykcodes.tech)
+- **GitHub:** [@mykcodes](https://github.com/mykcodes)
+- **LinkedIn:** [mynksharma](https://linkedin.com/in/mynksharma)
+
+---
 
 ## Features
 

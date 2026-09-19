@@ -1,9 +1,18 @@
 {
   "name": "codeding",
   "displayName": "CodeDing",
-  "description": "Play sounds when terminal commands finish",
+  "description": "CodeDing plays customizable sounds when your terminal commands finish, keeping you in flow while you wait for builds and scripts to complete.",
   "version": "1.0.0",
-  "publisher": "Developer",
+  "publisher": "mykcodes",
+  "author": {
+    "name": "Mayank Sharma",
+    "url": "https://mykcodes.tech"
+  },
+  "icon": "media/icon.jpg",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/mykcodes/CodeDing---VS-Code-Extension.git"
+  },
   "engines": {
     "vscode": "^1.93.0"
   },
@@ -62,27 +71,27 @@
         "codeding.enabled": {
           "type": "boolean",
           "default": true,
-          "description": "Enable or disable all CodeDing sounds."
+          "description": "Enable or disable CodeDing extension globally."
         },
         "codeding.successEnabled": {
           "type": "boolean",
           "default": true,
-          "description": "Enable or disable the success sound."
+          "description": "Play a sound when a command successfully completes (exit code 0)."
         },
         "codeding.errorEnabled": {
           "type": "boolean",
           "default": true,
-          "description": "Enable or disable the error sound."
+          "description": "Play a sound when a command fails (non-zero exit code)."
         },
         "codeding.successSound": {
           "type": "string",
           "default": "",
-          "description": "Path to a custom WAV file for success. Leave empty to use the built-in default."
+          "description": "Absolute path to a custom .wav file for success. If empty or invalid, the built-in default success sound is used."
         },
         "codeding.errorSound": {
           "type": "string",
           "default": "",
-          "description": "Path to a custom WAV file for error. Leave empty to use the built-in default."
+          "description": "Absolute path to a custom .wav file for errors. If empty or invalid, the built-in default error sound is used."
         },
         "codeding.triggerMode": {
           "type": "string",
@@ -92,7 +101,7 @@
             "custom"
           ],
           "default": "codeRun",
-          "description": "Determines which terminal commands trigger sounds."
+          "description": "Determines which terminal commands trigger sounds. 'codeRun' detects builds/scripts and ignores simple navigation commands like 'cd' and 'ls'. 'allTerminalCommands' triggers on everything. 'custom' uses regex patterns."
         },
         "codeding.customCommands": {
           "type": "array",
@@ -100,7 +109,7 @@
             "type": "string"
           },
           "default": [],
-          "description": "List of command string patterns to match when Trigger Mode is 'custom'."
+          "description": "A list of Regex strings. Only commands matching these patterns will trigger sounds when triggerMode is set to 'custom'."
         },
         "codeding.notificationLevel": {
           "type": "string",
