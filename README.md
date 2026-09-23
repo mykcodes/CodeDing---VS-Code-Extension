@@ -9,6 +9,7 @@ CodeDing is a lightweight, zero-configuration VS Code extension that plays non-i
 ### Created by [Mayank Sharma](https://mykcodes.tech)
 - **GitHub:** [@mykcodes](https://github.com/mykcodes)
 - **LinkedIn:** [mynksharma](https://linkedin.com/in/mynksharma)
+- **Extension** [CodeDing](https://marketplace.visualstudio.com/items?itemName=mykcodes.codeding)
 
 ---
 
