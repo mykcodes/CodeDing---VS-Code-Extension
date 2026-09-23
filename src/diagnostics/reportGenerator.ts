@@ -18,61 +18,65 @@ export class ReportGenerator {
             return "No active session found.";
         }
 
-        const events = await this.queryService.getEventsAround(sessionId, eventId, { before: 5, after: 1 });
-        const targetEvent = events.find(e => e.id === eventId);
+        const events = await this.queryService.getEventsAround(sessionId, eventId, { before: 5, after: 0 });
+        const targetEvent: any = events.find(e => e.id === eventId);
         
         if (!targetEvent) {
             return "Event not found.";
         }
 
-        let markdown = `# DevTrace Debug Report\n\n`;
-        markdown += `**Project/Workspace:** ${targetEvent.workspaceId}\n`;
-        markdown += `**Session:** ${sessionId}\n`;
-        markdown += `**Event Time:** ${new Date(targetEvent.timestamp).toLocaleString()}\n\n`;
+        // Find the latest Git event in context to determine the current branch
+        const gitEvents = events.filter(e => e.type === 'git');
+        const latestGit: any = gitEvents.length > 0 ? gitEvents[gitEvents.length - 1] : null;
+        const currentBranch = latestGit?.metadata?.current?.branch || 'Unknown';
 
-        markdown += `## Selected Event\n\n`;
-        markdown += this.formatEvent(targetEvent) + '\n\n';
+        let markdown = `# DEVTRACE DEBUG REPORT\n\n`;
+        markdown += `## Session\n\n`;
+        markdown += `Workspace: ${targetEvent.workspaceId}\n`;
+        markdown += `Branch: ${currentBranch}\n\n`;
 
-        markdown += `## Context (What Happened Before)\n\n`;
-        for (const e of events) {
-            if (e.id === targetEvent.id) {
-                markdown += `👉 **${this.formatEventShort(e)}**\n`;
-            } else {
-                markdown += `- ${this.formatEventShort(e)}\n`;
+        markdown += `## Failure\n\n`;
+        if (targetEvent.type === 'terminal') {
+            markdown += `Command: ${targetEvent.metadata.command}\n`;
+            markdown += `Exit code: ${targetEvent.metadata.exitCode !== undefined ? targetEvent.metadata.exitCode : 'Unknown'}\n`;
+            if (targetEvent.metadata.durationMs) {
+                markdown += `Duration: ${(targetEvent.metadata.durationMs / 1000).toFixed(1)}s\n`;
+            }
+        } else {
+            markdown += `Event: ${targetEvent.id}\n`;
+        }
+        markdown += `\n`;
+
+        markdown += `## Timeline Before Failure\n\n`;
+        for (const rawE of events) {
+            const e: any = rawE;
+            const time = new Date(e.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false });
+            if (e.type === 'terminal') {
+                markdown += `${time}  ${e.metadata.command}\n`;
+                markdown += `Exit code: ${e.metadata.exitCode !== undefined ? e.metadata.exitCode : '?'}\n\n`;
+            } else if (e.type === 'file') {
+                markdown += `${time}  File ${e.metadata.action}\n`;
+                markdown += `${e.metadata.relativePath}\n\n`;
+            } else if (e.type === 'git') {
+                markdown += `${time}  Git state changed\n`;
+                markdown += `${e.metadata.current?.branch || 'repo'} · ${e.metadata.current?.isDirty ? 'dirty' : 'clean'}\n\n`;
             }
         }
 
+        markdown += `## Git State\n\n`;
+        if (latestGit) {
+            const curr = latestGit.metadata.current;
+            markdown += `Branch: ${curr.branch || 'Unknown'}\n`;
+            markdown += `Working tree: ${curr.isDirty ? 'dirty' : 'clean'}\n`;
+            markdown += `Changed files: ${curr.changedFileCount || 0}\n\n`;
+        } else {
+            markdown += `No Git state recorded in context.\n\n`;
+        }
+
+        markdown += `## Evidence Note\n\n`;
+        markdown += `This report contains observed development events.\n`;
+        markdown += `It does not establish causality between events.\n`;
+
         return RedactionService.redact(markdown);
-    }
-
-    private formatEvent(e: any): string {
-        let text = '';
-        if (e.type === 'terminal') {
-            text += `**Command:** \`${e.metadata.command}\`\n`;
-            text += `**Exit Code:** ${e.metadata.exitCode !== undefined ? e.metadata.exitCode : 'Unknown'}\n`;
-            text += `**Duration:** ${e.metadata.durationMs ? e.metadata.durationMs + 'ms' : 'Unknown'}\n`;
-            text += `**Working Directory:** ${e.metadata.cwd}\n`;
-        } else if (e.type === 'file') {
-            text += `**Action:** ${e.metadata.action}\n`;
-            text += `**File:** \`${e.metadata.relativePath}\`\n`;
-        } else if (e.type === 'git') {
-            text += `**Git State Changed**\n`;
-            text += `**Branch:** ${e.metadata.current?.branch}\n`;
-            text += `**HEAD:** ${e.metadata.current?.head}\n`;
-            text += `**Dirty:** ${e.metadata.current?.isDirty} (${e.metadata.current?.changedFileCount} files)\n`;
-        }
-        return text;
-    }
-
-    private formatEventShort(e: any): string {
-        const time = new Date(e.timestamp).toLocaleTimeString();
-        if (e.type === 'terminal') {
-            return `[${time}] Terminal: \`${e.metadata.command}\` (Exit ${e.metadata.exitCode})`;
-        } else if (e.type === 'file') {
-            return `[${time}] File ${e.metadata.action}: \`${e.metadata.relativePath}\``;
-        } else if (e.type === 'git') {
-            return `[${time}] Git state changed (${e.metadata.current?.branch || 'repo'})`;
-        }
-        return `[${time}] Unknown event`;
     }
 }

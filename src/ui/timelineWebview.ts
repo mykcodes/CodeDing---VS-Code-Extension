@@ -128,7 +128,11 @@ export class TimelineWebview {
                         <span id="session-info">Session Active</span>
                     </div>
                     <div class="header-controls">
-                        <input type="text" id="search-input" placeholder="Search events..." />
+                        <div class="search-container">
+                            <input type="text" id="search-input" placeholder="Search events..." />
+                            <button id="clear-search-btn" class="hidden" title="Clear Search">×</button>
+                            <span id="search-results-count" class="hidden"></span>
+                        </div>
                         <select id="filter-select">
                             <option value="all">All Events</option>
                             <option value="terminal">Terminal</option>
@@ -144,8 +148,16 @@ export class TimelineWebview {
 
                 <div id="loading-indicator" class="hidden">Loading...</div>
                 <div id="empty-state" class="hidden">
-                    <h2>DevTrace is ready.</h2>
-                    <p>Your development activity will appear here as you work.</p>
+                    <h2>No development activity recorded yet.</h2>
+                    <p>Run a command, save a file, or make a Git change to start building your timeline.</p>
+                </div>
+                <div id="empty-search-state" class="hidden">
+                    <h2 style="text-align:center; padding: 40px; color: var(--vscode-descriptionForeground);">No matching events found.</h2>
+                </div>
+
+                <div id="new-events-banner" class="hidden">
+                    <span id="new-events-text"></span>
+                    <span>[Jump to latest]</span>
                 </div>
 
                 <script nonce="${nonce}" src="${scriptUri}"></script>

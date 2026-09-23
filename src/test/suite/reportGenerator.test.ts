@@ -70,9 +70,10 @@ suite('ReportGenerator Test Suite', () => {
         const markdown = await reportGenerator.generate('evt_2');
 
         // Verify factual elements
-        assert.ok(markdown.includes('DevTrace Debug Report'));
-        assert.ok(markdown.includes('**Exit Code:** 1'));
-        assert.ok(markdown.includes('File modified: `src/app.ts`'));
+        assert.ok(markdown.includes('DEVTRACE DEBUG REPORT'));
+        assert.ok(markdown.includes('Exit code: 1'));
+        assert.ok(markdown.includes('File modified'));
+        assert.ok(markdown.includes('src/app.ts'));
         
         // Verify redaction
         assert.ok(markdown.includes('[REDACTED]'));

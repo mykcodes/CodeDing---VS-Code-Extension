@@ -104,4 +104,23 @@ suite('QueryService Test Suite', () => {
         assert.strictEqual(context[0].id, 'evt_3');
         assert.strictEqual(context[3].id, 'evt_6');
     });
+
+    test('handles malformed JSONL gracefully', async () => {
+        // Write valid event, malformed line, valid event directly to file
+        const logFileUri = vscode.Uri.joinPath(tempDir, `${sessionId}.jsonl`);
+        const validEvent1 = { id: 'evt_a', type: 'terminal', timestamp: 100, workspaceId: 'test' };
+        const validEvent2 = { id: 'evt_b', type: 'file', timestamp: 102, workspaceId: 'test' };
+        
+        const content = JSON.stringify(validEvent1) + '\n' +
+            '{ this is completely invalid json \n' +
+            JSON.stringify(validEvent2) + '\n';
+            
+        await vscode.workspace.fs.writeFile(logFileUri, Buffer.from(content, 'utf8'));
+
+        const events = await queryService.getEvents(sessionId);
+        
+        assert.strictEqual(events.length, 2);
+        assert.strictEqual(events[0].id, 'evt_a');
+        assert.strictEqual(events[1].id, 'evt_b');
+    });
 });
