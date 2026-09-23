@@ -1,7 +1,23 @@
-export type ExecutionClassification = 
+export type ExecutionType = 
     | "codeExecution"
     | "ordinaryCommand"
     | "unknown";
+
+export type ExecutionCategory = 
+    | "build"
+    | "test"
+    | "packageManager"
+    | "git"
+    | "devServer"
+    | "compiler"
+    | "codeRunner"
+    | "other"
+    | "unknown";
+
+export interface ExecutionClassification {
+    type: ExecutionType;
+    category: ExecutionCategory;
+}
 
 export type TriggerMode = "codeRun" | "allTerminalCommands" | "custom";
 

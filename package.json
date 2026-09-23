@@ -1,7 +1,7 @@
 {
-  "name": "codeding",
-  "displayName": "CodeDing",
-  "description": "CodeDing plays customizable sounds when your terminal commands finish, keeping you in flow while you wait for builds and scripts to complete.",
+  "name": "devtrace",
+  "displayName": "DevTrace",
+  "description": "DevTrace is a local-first development session recorder for VS Code.",
   "version": "1.0.0",
   "publisher": "mykcodes",
   "author": {
@@ -24,7 +24,12 @@
     "terminal",
     "audio",
     "success",
-    "error"
+    "error",
+    "record",
+    "history"
+  ],
+  "extensionDependencies": [
+    "vscode.git"
   ],
   "activationEvents": [
     "onStartupFinished"
@@ -33,45 +38,69 @@
   "contributes": {
     "commands": [
       {
+        "command": "devtrace.openTimeline",
+        "title": "DevTrace: Open Timeline"
+      },
+      {
+        "command": "devtrace.startSession",
+        "title": "DevTrace: Start New Session"
+      },
+      {
+        "command": "devtrace.endSession",
+        "title": "DevTrace: End Session"
+      },
+      {
+        "command": "devtrace.createDebugReport",
+        "title": "DevTrace: Create Debug Report"
+      },
+      {
+        "command": "devtrace.searchHistory",
+        "title": "DevTrace: Search Session History"
+      },
+      {
+        "command": "devtrace.clearHistory",
+        "title": "DevTrace: Clear Session History"
+      },
+      {
         "command": "codeding.chooseSuccessSound",
-        "title": "CodeDing: Choose Success Sound"
+        "title": "DevTrace (Audio): Choose Success Sound"
       },
       {
         "command": "codeding.chooseErrorSound",
-        "title": "CodeDing: Choose Error Sound"
+        "title": "DevTrace (Audio): Choose Error Sound"
       },
       {
         "command": "codeding.testSuccessSound",
-        "title": "CodeDing: Test Success Sound"
+        "title": "DevTrace (Audio): Test Success Sound"
       },
       {
         "command": "codeding.testErrorSound",
-        "title": "CodeDing: Test Error Sound"
+        "title": "DevTrace (Audio): Test Error Sound"
       },
       {
         "command": "codeding.resetSuccessSound",
-        "title": "CodeDing: Reset Success Sound"
+        "title": "DevTrace (Audio): Reset Success Sound"
       },
       {
         "command": "codeding.resetErrorSound",
-        "title": "CodeDing: Reset Error Sound"
+        "title": "DevTrace (Audio): Reset Error Sound"
       },
       {
         "command": "codeding.openSettings",
-        "title": "CodeDing: Open Settings"
+        "title": "DevTrace: Open Settings"
       },
       {
         "command": "codeding.toggle",
-        "title": "CodeDing: Toggle Enable/Disable"
+        "title": "DevTrace (Audio): Toggle Enable/Disable"
       }
     ],
     "configuration": {
-      "title": "CodeDing",
+      "title": "DevTrace",
       "properties": {
         "codeding.enabled": {
           "type": "boolean",
           "default": true,
-          "description": "Enable or disable CodeDing extension globally."
+          "description": "Enable or disable audio notifications globally."
         },
         "codeding.successEnabled": {
           "type": "boolean",
@@ -118,7 +147,7 @@
             "diagnostics"
           ],
           "default": "quiet",
-          "description": "Level of notifications CodeDing should show."
+          "description": "Level of notifications DevTrace should show."
         }
       }
     }

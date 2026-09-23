@@ -1,4 +1,4 @@
-import { ExecutionClassification, TriggerMode } from '../types';
+import { ExecutionClassification, ExecutionCategory, TriggerMode } from '../types';
 
 export class ExecutionClassifier {
     // A conservative list of known non-code execution commands
@@ -12,11 +12,11 @@ export class ExecutionClassifier {
     public static classify(commandLine: string, triggerMode: TriggerMode, customCommands: string[] = []): ExecutionClassification {
         const trimmed = commandLine.trim();
         if (!trimmed) {
-            return "unknown";
+            return { type: "unknown", category: "unknown" };
         }
 
         if (triggerMode === "allTerminalCommands") {
-            return "codeExecution";
+            return { type: "codeExecution", category: "other" };
         }
 
         if (triggerMode === "custom") {
@@ -24,14 +24,14 @@ export class ExecutionClassifier {
                 for (const pattern of customCommands) {
                     const regex = new RegExp(pattern);
                     if (regex.test(trimmed)) {
-                        return "codeExecution";
+                        return { type: "codeExecution", category: "other" };
                     }
                 }
             } catch (e) {
                 // If regex is invalid, fail safely
-                return "unknown";
+                return { type: "unknown", category: "unknown" };
             }
-            return "ordinaryCommand";
+            return { type: "ordinaryCommand", category: "other" };
         }
 
         // codeRun mode heuristic
@@ -47,25 +47,44 @@ export class ExecutionClassifier {
         const executable = parts[parts.length - 1].toLowerCase();
         const baseExecutable = executable.endsWith('.exe') ? executable.slice(0, -4) : executable;
 
-        // 1. If it's a known ordinary command, ignore it
+        // Determine specific category based on executable
+        let category: ExecutionCategory = "unknown";
+        if (['npm', 'yarn', 'pnpm', 'npx', 'bun'].includes(baseExecutable)) {
+            category = "packageManager";
+            if (command.includes('run build') || command.includes('run compile')) category = "build";
+            if (command.includes('run test') || command.includes('test')) category = "test";
+            if (command.includes('run dev') || command.includes('start')) category = "devServer";
+        } else if (['git', 'svn', 'hg'].includes(baseExecutable)) {
+            category = "git";
+        } else if (['pytest', 'jest', 'mocha', 'vitest'].includes(baseExecutable)) {
+            category = "test";
+        } else if (['tsc', 'javac', 'gcc', 'g++', 'clang', 'clang++', 'go', 'cargo'].includes(baseExecutable)) {
+            if (['go', 'cargo'].includes(baseExecutable) && command.includes('test')) category = "test";
+            else if (['go', 'cargo'].includes(baseExecutable) && command.includes('run')) category = "codeRunner";
+            else category = "compiler";
+        } else if (['node', 'python', 'python3', 'ts-node', 'tsx', 'deno', 'dotnet', 'java', 'ruby', 'perl', 'php'].includes(baseExecutable)) {
+            category = "codeRunner";
+        }
+
+        // 1. If it's a known ordinary command
         if (this.ORDINARY_COMMANDS.has(baseExecutable)) {
-            return "ordinaryCommand";
+            return { type: "ordinaryCommand", category: category !== "unknown" ? category : "other" };
         }
 
         // 2. Look for obvious build/run triggers
-        const buildRunTriggers = ['npm', 'yarn', 'pnpm', 'npx', 'node', 'python', 'python3', 'go', 'cargo', 'dotnet', 'java', 'javac', 'make', 'gcc', 'g++', 'clang', 'clang++', 'ts-node', 'tsx', 'bun', 'deno', 'pytest', 'jest'];
+        const buildRunTriggers = ['npm', 'yarn', 'pnpm', 'npx', 'node', 'python', 'python3', 'go', 'cargo', 'dotnet', 'java', 'javac', 'tsc', 'make', 'gcc', 'g++', 'clang', 'clang++', 'ts-node', 'tsx', 'bun', 'deno', 'pytest', 'jest'];
         
         if (buildRunTriggers.includes(baseExecutable)) {
-            return "codeExecution";
+            return { type: "codeExecution", category: category !== "unknown" ? category : "other" };
         }
 
         // 3. Executable runs (e.g. ./program, .\program.exe)
         // If the command starts with ./ or .\ it's likely a local execution
         if (command.startsWith('./') || command.startsWith('.\\')) {
-            return "codeExecution";
+            return { type: "codeExecution", category: "other" };
         }
 
         // 4. Default to unknown for safety
-        return "unknown";
+        return { type: "unknown", category: "unknown" };
     }
 }
